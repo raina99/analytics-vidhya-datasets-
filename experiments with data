@@ -1,0 +1,117 @@
+This dataset is taken from analytics vidhya experiments with data workshop 
+Dataset enables us to predict classify customers that will churn out for a specific loan  
+
+e <- read.csv("train_gbW7HTd.csv",na.strings = "",stringsAsFactors =  FALSE   )
+d <- read.csv("test_2AFBew7.csv",na.strings = "",stringsAsFactors =  FALSE   )
+## UNIVARIATE ANALYSIS
+str(c)
+library(dplyr)
+cont <- select(e,ID,Age,Hours.Per.Week)
+cat <- subset(e,select = -c(ID,Age,Hours.Per.Week))
+summary(cat)
+summary(cont)
+## boxplot for any variable can be drawn
+boxplot(cont$ID)
+boxplot(cat$Workclass)## not for categorical variable
+## pastecs
+install.packages("pastecs")
+library(pastecs)
+options(scipen = 100)
+options(digits = 2)
+stat.desc(cont)
+### 
+count and count % for categorical
+ length(unique(cat$Workclass))
+apply(cat,2,function(x){length(unique(x))})
+#  table
+table(cat$Marital.Status)
+table(cat$Race)
+table(cat$Income.Group)
+ar <- arrange(cat,Race)
+ sp <- split(ar,ar$Race)
+as.matrix(prop.table(table(cat$Race)))
+## native country 
+sort(table(cat$Native.Country), decreasing = TRUE )
+head( round(sort(prop.table(table(cat$Native.Country)),decreasing = TRUE), 6),20)
+IQR(cont$Age)
+## multivariate analysis
+library(gmodels)
+CrossTable(e$Sex,e$Income.Group)
+## visulization
+library(ggplot2)
+ggplot(e, mapping = aes(x =Sex, fill = Income.Group))+
+  geom_bar() + labs(title = "stacked bar chart", x = "Sex",y = "Count")+
+  theme_bw()
+## age and hours per week 
+ggplot(e, mapping = aes(fil= Hours.Per.Week, x = Age ))+
+  geom_bar()
+## cat and continuos 
+ggplot(e, mapping = aes(x = Sex, y = Income.Group))+
+  geom_boxplot()+ labs( title = "boxplot")
+## missing values
+table(is.na(e))
+colSums(is.na(e))
+colSums(is.na(d))
+library(mlr)
+itrain <- impute(train, classes = list(factor = imputeMode()))
+library(dplyr)
+installing impute 
+imputed <- impute(d, classes = list(factor = imputeMode))
+d <- imputed$data
+## do manual imputation using mode 
+ train$Workclass[is.na(train$Workclass)] = mode(train$Workclass)
+train$Workclass[is.na(train$Workclass)]= mode(train$Workclass)
+library(ggplot2)
+ggplot(train, mapping = aes(x = ID,y = Age))+
+  geom_jitter()
+ggplot(train, mapping = aes(x = ID,y = Hours.Per.Week))+
+  geom_jitter()
+## variable transformation 
+sapply(train, class)
+
+as.matrix(prop.table(table(train$Workclass)))
+as.matrix(prop.table(table(train$Education)))
+## group values < 5 %
+install.packages("car")
+library(car)
+
+train$Workclass <- recode(train$Workclass,"c('State-govt','self-emp-inc','Federal-gov','Without-pay','Never-worked')='Others'")
+x <- c('State-govt','self-emp-inc','Federal-gov','Without-pay','Never-worked')
+as.matrix(prop.table(table(train$Workclass)))
+## for test 
+test$Workclass <- recode(test$Workclass,"c('State-govt','self-emp-inc','Federal-gov','Without-pay','Never-worked')='Others'")
+as.matrix(prop.table(table(test$Workclass)))
+## bins
+ggplot(train, mapping = aes(x = Hours.Per.Week)) +
+  geom_histogram( binwidth = 5)
+hist(Hours.Per.Week, main = "histogram for hours per week", xlab = "hours per week", breaks = 5,border = "green, col = " blue")
+## encoding levels
+
+c <- train$Income.Group
+d <- (as.factor(c))
+## 0r use match
+match(c, unique(c))
+train$Income.Group <- match(train$Income.Group,unique(train$Income.Group))
+
+ View(train)
+     table(train$Income.Group)
+## remove identifier ID 
+train <- subset(train, select = - c(ID))
+## decisin trees
+set.seed(333)
+ fit <- rpart(Income.Group ~.,data = train, method = "class", control = rpart.control(minsplit = 20, minbucket = 100, maxdepth = 10, xval = 5)) 
+      summary(fit)
+## plot it as a tree
+library(rpart.plot)
+install.packages(" rpart.plot")
+# predict function used
+## USE PRED  TO MAKE predictions
+
+ pred <- predict (fit ,t ,type = "class" )
+pred_train <- predict(fit,train,type = "class" )
+      confusionMatrix(pred_train,train$Income.Group)
+solution.frame <- data.frame(ID = test$ID, Income.Group = pred)
+
+write.csv(solution.frame,file = "final_solution.csv")
+mtcars[,] <- lapply(mtcars, function(x) type.convert(as.character(x), as.is = TRUE))
+e <- solution.frame
