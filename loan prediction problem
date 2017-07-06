@@ -1,0 +1,238 @@
+ About Company
+Dream Housing Finance company deals in all home loans. They have presence across all urban, semi urban and rural areas. 
+Customer first apply for home loan after that company validates the customer eligibility for loan.
+  Problem statement 
+Company wants to automate the loan eligibility process (real time) based on customer detail provided while filling online application form.
+These details are Gender, Marital Status, Education, Number of Dependents, Income, Loan Amount, Credit History and others.
+To automate this process, they have given a problem to identify the customers segments, those are eligible for loan amount 
+so that they can specifically target these customers. 
+## my approach and answer to problem 
+
+library('ggplot2') # visualization
+library('ggthemes') # visualization
+library('scales') # visualization
+library('dplyr') # data manipulation
+library('mice') # imputation
+library('randomForest') # classification algorithm
+
+
+#COMBINE applicant and coapplicant income
+#represent loan amount as percentage of total income
+ train <- read.csv("train_u6lujuX_CVtuZ9i.csv", stringsAsFactors = FALSE)
+ test <- read.csv("test_Y3wMUE5_7gLdaTN.csv", stringsAsFactors = FALSE)
+test$Loan_Status <- NA ## as loan status column was missing in test
+full <- rbind(train,test)## binding them
+## explorartory data analysis
+str(full)
+table(full$Gender, full$Loan_Status)
+## Being male is beneficial for loan approval
+library(gmodels)
+CrossTable(full$Gender, full$Loan_Status)
+table(full$Married, full$Loan_Status)
+CrossTable(full$Married, full$Loan_Status)
+# Married are much preferred when considering loan
+names(full)
+table(full$Education, full$Loan_Status)
+## graduate preferred for loan
+table(full$Self_Employed, full$Loan_Status)
+## self employed not preferred 
+table(full$Credit_History, full$Loan_Status)
+#credit  history (1) preferred by a large margin 
+table(full$Dependents, full$Loan_Status)
+CrossTable(full$Dependents, full$Loan_Status)
+## order of preference for loan 0>2>1> 3+
+table(full$Loan_Amount_Term, full$Loan_Status)
+CrossTable(full$Loan_Amount_Term, full$Loan_Status)
+## inconclusive 
+table(full$Property_Area, full$Loan_Status)
+CrossTable(full$Property_Area, full$Loan_Status)
+## semiurban >rural>urban
+
+
+
+## feature engineering 
+ full$total_income <- full$ApplicantIncome + full$CoapplicantIncome
+ 
+ #ggplot for different ( multivariate analysis)
+ 
+   ggplot(full[1:614,], mapping = aes(x = Loan_Status, fill = Education))+
+  geom_bar(position = "fill") +
+   theme_few() ## stacked bar 
+   
+   ggplot(full[1:614,], mapping = aes( x = Loan_Status, fill = Dependents)) +
+          geom_bar(  position = "dodge" )## 
+   
+   
+   ## no dependent preferred for loan 
+   
+   ggplot(full[1:614,], mapping = aes( x = Loan_Status, y = Gender ,color = dependents_members))+
+     +geom_jitter() ##
+   
+   ## property area 
+   ggplot(full[1:614,], mapping = aes( x = Loan_Status, fill =Property_Area))+
+     geom_bar( position = "dodge")## 
+   
+   #semiurban>urban>rural(yes)
+  # rural = urban < semiurban(no)
+   ggplot(full[1:614,], mapping = aes( x = Loan_Status, fill = Credit_History))+
+     geom_bar( position = "dodge")## 
+   
+  ##
+   
+   ggplot(full[1:614,], mapping = aes( x = factor(Loan_Status), fill =  income_status )) +
+     geom_bar( position = "dodge")##
+    ## preference middle more as they are more in number then good then high income (yes)
+   ## 
+   geom_bar( position = "fill")##
+    ggplot(full[1:614,], mapping = aes( x = factor(Loan_Status), fill =  income_status )) +
+     geom_bar( position = "dodge")##
+    
+    ## feature engineering 
+    
+    df3 <- full %>%
+      mutate(income_status = case_when(
+        total_income < 5000                  ~ "low income",
+        total_income>5000 & total_income < 13000 ~ "middle income",
+        total_income> 13000 & total_income < 28000 ~ "good income",
+        total_income > 28000                  ~ ">high income",
+        TRUE                             ~ "NA"
+      ))
+    
+    
+    rm(full)
+    full <- df3
+    
+    ## feature engineering for members 
+    df4 <- full%>%
+      mutate(dependent_members  = case_when(
+        Dependents  == "0"                  ~ "no dependent ",
+        Dependents == "1" | Dependents == "2" ~ "moderately dependent ",
+        Dependents ==  "3+"  ~ " highly dependent",
+        TRUE                             ~ "NA"
+      ))
+    
+    rm(full)
+    full <- df4
+    
+    
+   
+   ggplot(full[1:614,], mapping = aes( x = factor(Loan_Status), fill =  income_status )) +
+     +geom_bar( position = "dodge")##
+   
+   ## middle>low>high>good(yes)
+   ## low >middle>high>good(no)
+   ## credit history 
+   ggplot(full[1:614,], mapping = aes( x =  factor(Loan_Status), y = Credit_History)) +
+     geom_jitter() ##
+   
+   ## missing values now only
+   colSums(is.na(full))
+   
+   library(ggplot2)
+   
+  
+  
+   
+   
+   colSums(is.na(full))
+   
+   ## loan status367 missing values are valid as it is test data
+   full$ApplicantIncome[is.na(full$ApplicantIncome)]= median(full$ApplicantIncome, na.rm = TRUE)
+   full$LoanAmount[is.na(full$LoanAmount)]= median(full$LoanAmount, na.rm = TRUE)
+   full$Credit_History[is.na(full$Credit_History)]= median(full$Loan_Amount_Term, na.rm = TRUE)
+  
+   full$Loan_Amount_Term[is.na(full$Loan_Amount_Term)]= median(full$Loan_Amount_Term, na.rm = TRUE)
+   
+    ## treating outliers
+    
+   library(outliers)
+   grubbs.test(full$LoanAmount, type = 10)
+   
+   (v <- which(full$ApplicantIncome == 81000, arr.ind = TRUE))
+   
+   full[410,7] <- NA
+   
+   full$ApplicantIncome[is.na(full$ApplicantIncome)] = median(full$ApplicantIncome, na.rm = TRUE)
+   
+   full[601,8] <- NA
+    full$CoapplicantIncome[is.na(full$CoapplicantIncome)] = median(full$CoapplicantIncome, na.rm = TRUE)
+     
+   library(gdata)
+   
+   
+   ## getting wrong values in credit history as high as 360 instead of 0 and 1
+    full[,11] <- NULL
+   full[,16] <- df4[,11]
+   max(full$V16)
+   
+   
+   ##
+   full$Credit_History[is.na(full$Credit_History)] = median(full$Credit_History, na.rm = TRUE)
+    colSums(is.na(full))
+
+   ##
+   
+   colnames(full)[16] <- "Credit_History"
+   train <- full[1:614,]
+   test <- full[615:981,]
+   
+   ## converting variable into factor in order to avoid warning messages 
+   train$Gender<- as.factor(train$Gender)
+    train$Married<- as.factor(train$Married)
+   train$Education<- as.factor(train$Education)
+    train$Self_Employed<- as.factor(train$Self_Employed)
+    train$Property_Area<- as.factor(train$Property_Area)
+   train$Dependents <- as.factor(train$Dependents)
+   train$dependent_members <- as.factor(train$dependent_members)
+   train$income_status <- as.factor(train$income_status)
+   ## removing identifier Loan  ID
+   train <- train[,-1]
+   #
+    fit_classify = randomForest(Loan_Status~ ., train, importance = TRUE, ntree = 800)
+    
+    ## removing NA from test
+    test$Loan_Status <- sapply(test$Loan_Status, as.character)
+    test$Loan_Status[is.na(test$Loan_Status)] <- " "
+    test$Loan_Status <- as.factor(test$Loan_Status)
+    
+    
+   
+   ## prediction
+    pred = predict(fit_classify, test)
+    ## to remove problem of train and test not mtaching by identifying variable having unequal levels
+    levels(test$Married) <- levels(train$Married)
+    ### 
+    importance <- importance(fit_classify)
+    0r 
+    importance(fit_classify, type = 2)
+    
+    varImportance <- data.frame(Variables = row.names(importance), 
+                                Importance = round(importance[ ,'MeanDecreaseGini'],2))
+    
+    # Create a rank variable based on importance
+    rankImportance <- varImportance %>%
+      mutate(Rank = paste0('#',dense_rank(desc(Importance))))
+    
+    # Use ggplot2 to visualize the relative importance of variables
+    ggplot(rankImportance, aes(x = reorder(Variables, Importance), 
+                               y = Importance, fill = Importance)) +
+      geom_bar(stat='identity') + 
+      geom_text(aes(x = Variables, y = 0.5, label = Rank),
+                hjust=0, vjust=0.55, size = 4, colour = 'red') +
+      labs(x = 'Variables') +
+      coord_flip() + 
+      theme_few()
+    
+    # we made our total income variable. It has the  second highest relative importance
+    ## 
+    # Save the solution to a dataframe with two columns: PassengerId and Survived (prediction)
+    solution <- data.frame(Loan_ID = test$Loan_ID, Loan_Status = pred)
+    
+    # Write the solution to file
+    write.csv(solution, file = 'Loan prediction problem ', row.names = F)
+    
+    
+   
+   
+   
+   
