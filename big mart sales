@@ -1,0 +1,236 @@
+#The data scientists at BigMart have collected 2013 sales data for 1559 products across 10 stores in different cities. Also, certain attributes of each product and store have been defined. The aim is to build a predictive model and find out the sales of each product at a particular store.
+ #Using this model, BigMart will try to understand the properties of products and stores which play a key role in increasing sales.
+ ### Big mart sales ##
+ dir()
+library(data.table)
+require(data.table)
+
+train <-fread("Train_UWu5bXk.csv", header = T, stringsAsFactors = F)# FAST READING THE TRAIN 
+test <- fread("Test_u94Q5KV.csv", header = T, stringsAsFactors = F)## FAST READING THE TEST
+
+## This is a regression problem and evaluation metric is RMSE so it is important to make sure 
+# that there are no outliers  as it can inflate values in case of RMSE . 
+str(train)
+summary(train)
+library(CrossTable)
+ as.matrix(table(train$Item_Visibility, train$Item_Outlet_Sales))
+## It  wont work as it had a lot values as dataset is big
+
+ ## data exploration 
+ library(ggplot2)
+ ggplot(data = train, mapping = aes(x = Item_Weight, y =Item_Outlet_Sales))+
+   geom_jitter()+
+   geom_smooth()
+ ##  weight of items has no affect on sales
+ 
+ ggplot(data = train, mapping = aes(x = Item_Fat_Content, y = Item_Outlet_Sales))+
+   geom_jitter()+
+   geom_smooth()
+ ## Regular>LOW Fat >LF>low fat == reg  # all are diff categories
+ 
+ 
+  ggplot(data = train, mapping = aes(x =Item_Weight, y = Item_Outlet_Sales))+
+    geom_jitter( mapping = aes(color = Item_Fat_Content))
+  # no relation between weight and fat content.
+  
+  ggplot(data = train, mapping = aes(x = train$Item_MRP, y = Item_Outlet_Sales))+
+    geom_jitter()
+    
+  # upto 150 MRP price it is quite dense which means that products are more in number and are 
+  # close in prices 
+  # after 150 products are less dense and after 200 MRP more  less dense but products 
+  # highest in no are having above 200 MRP
+ 
+   ggplot(data = train, mapping = aes(x = Item_Visibility, y = Item_Outlet_Sales))+
+    geom_jitter( mapping = aes(color =Item_MRP))
+   #low visible items have good sales
+   
+   
+   ggplot(data = train, mapping = aes(x = Item_Visibility,sup  y = Item_Outlet_Sales))+
+     geom_jitter( mapping = aes(color = Outlet_Type)) 
+     
+   # supermarket type 1 > supermarket type 2> supermarket type 3>grocery store type of store matters more
+   
+   
+   
+   ggplot(data = train, mapping = aes(x =train$Outlet_Size, y = Item_Outlet_Sales))+
+     geom_jitter( mapping = aes(color = Outlet_Type))
+     
+  # sup type 1 has high size but sales due to type not size .
+   # grocery has high size but not enough sales 
+   # supermarket type 1 of high size maximise sales 
+   
+   
+   
+   ggplot(data = train, mapping = aes(x =train$Outlet_Location_Type, y = Item_Outlet_Sales))+
+     geom_jitter( mapping = aes(color = Outlet_Type))
+   # tier 1 and tier 2 of sup 1 has high sales density 
+   # it mostly is due to mart type 
+   
+   
+   
+   ggplot(data = train, mapping = aes(x = Item_Type, y = Item_Outlet_Sales))+
+     geom_jitter( mapping = aes(color = Outlet_Type))
+  ## grocery store items of every type sold low in  number 
+   # supermarket type 1 store items of every item sold high in number 
+   # supermarket type 2 and sup type 3 of every items sold moderayte in no .
+   # for every item supermarket type that is outlet type plays a major part
+   
+   
+   
+   ggplot(data = train, mapping = aes(x = Outlet_Establishment_Year, y = Item_Outlet_Sales))+
+     geom_jitter( mapping = aes(color = Outlet_Type))
+   
+ # supermarket type 3 doing good sale of old time 1985
+# rest supermarket type 1  and sup type 2 of old and new   doing same sales
+   
+ ## missing values 
+   # importantly outlet type and outlet location and size
+   colSums(is.na(train))
+   # tried all methods but at the end median gave 12.3 , mean gave 12.78, knn gave 18.2
+   # mice gave 9.3 exact for 9.3
+   train <- subset(train,select = -c( character variables)
+     md.pattern(train) 
+     imputed_Data <- mice((tr), m=5, maxit = 50, method = 'pmm', seed = 500)
+   summary(imputed_Data)# tells u all
+   completedata <- complete(imputed_Data,2)# u can choose any out of 5 as there are five imputed datasets
+   completedata$Item_Weight# gives u8 all values
+   
+   
+   # note - for using knn and mice create a subset like train <- subset(train,select = -c(variables)
+   # and then use mice , we remove all character variables
+   # 
+   
+   # outliers
+   library(outliers)
+   library(gmodels)
+   grubbs.test(train$Item_Visibility, type = 10)
+   (v = which(train$Item_Visibility == 0.328390948, arr.ind = TRUE))
+   boxplot(train$Item_Visibility)
+   grubbs.test(tr$Item_Visibility, type = 10)
+   (v = which(train$Item_Visibility == 0.32111501, arr.ind = TRUE))
+   tr$Item_Visibility[1806] <- NA
+   # done 
+   # now again boxplot
+   boxplot(tr$Item_Visibility)
+   
+   # not an outlier
+   
+   grubbs.test(train$Item_MRP, type = 10)
+   (v = which(train$Item_MRP == 266.8884, arr.ind = TRUE))
+   boxplot(train$Item_MRP)
+   
+   # not an outlier as it looks 
+   
+   grubbs.test(train$Outlet_Establishment_Year, type = 10)
+   (v = which(train$Outlet_Establishment_Year == 1985, arr.ind = TRUE))
+   boxplot(train$Outlet_Establishment_Year)
+  
+  
+  # not  an outlier
+   grubbs.test(train$Item_Weight, type = 10)
+   (v = which(train$Item_Weight == 21.35, arr.ind = TRUE))
+ boxplot(train$Item_Weight)
+ 
+ 
+ ## taking out  2 outliers is enough
+ train$Item_Visibility <- NULL
+ train$Item_Visibility <- tr$Item_Visibility
+ boxplot(train$Item_Visibility)
+ 
+ ## feature engineering 
+ colSums(is.na(test))
+ train$Outlet_Size[4]
+ 
+ ## converting empty strings into NA 
+ train[train == ""] <- NA
+ colSums(is.na(train))
+ 
+ ## finally used a subset and converted outlet size variable into numeric and factors using s.numeric
+ # and as.factors
+ complet <- complete(imputed_Data,2)
+ train$Outlet_Size <- NULL
+  train$Outlet_Size <- complet$Outlet_Size
+   
+  
+  unique(train)# to cHeck if there is any "" value in any variable
+  
+  # test imputation
+  colSums(is.na(test))
+  
+  # test imputation
+ # imputed test values for weight and outlet size using only mice 
+  test$Outlet_Size <- NULL
+  test$Outlet_Size <- complete_test$Outlet_Size
+  
+  
+  # converting into factors except outlet size
+  train$Item_Fat_Content <- as.factor(train$Item_Fat_Content)
+  > unique(train$Item_Fat_Content)
+  [1] Low Fat Regular low fat LF      reg    
+  Levels: LF low fat Low Fat reg Regular
+  train$Item_Type <- as.factor(train$Item_Type)
+  train$Outlet_Location_Type<- as.factor(train$Outlet_Location_Type)
+  train$Outlet_Type<- as.factor(train$Outlet_Type)
+  
+  # removing identifiers
+  train <- train[,-c(1,5)]
+  #
+ # test converting into factors
+  test$Outlet_Type <- as.factor(test$Outlet_Type)
+  test$Outlet_Location_Type <- as.factor(test$Outlet_Location_Type)
+  test$Item_Type <- as.factor(test$Item_Type)
+  test$Item_Fat_Content <- as.factor(test$Item_Fat_Content)
+  str(test)
+  
+   
+ ## RANDOM FOREST 
+ 
+   rf_model1 <- randomForest(Item_Outlet_Sales~ .,data = train, importance = TRUE, ntree = 800)# taking all variables
+   pred_rf1 <- predict(rf_model1, test)
+     ##
+ rf_model2 <- randomForest(Item_Outlet_Sales ~Item_Type + Item_MRP + 
+    Outlet_Establishment_Year + Outlet_Location_Type + Outlet_Type + Item_Weight 
+  + Item_Visibility + Outlet_Size, data = train, importance = TRUE,ntree = 800 ) ## ignoring vraible fat content in model
+ 
+ pred_rf2 <- predict(rf_model2, test)
+
+ #  
+ importance2 <- importance(rf_model1)
+ varImpPlot(rf_model1)
+ #
+   # 
+solution2 <- data.frame(Item_Identifier= test$Item_Identifier,
+    Outlet_Identifier= test$Outlet_Identifier, Item_Outlet_Sales = pred_rf2)
+   
+write.csv(solution2, file = 'bigmart sales 2 ', row.names = F)
+# rmse score improved
+
+    ###
+rf_model3 <- randomForest(Item_Outlet_Sales ~  Item_MRP + 
+   Outlet_Establishment_Year + Outlet_Location_Type + Outlet_Type + Item_Weight 
+   + Item_Visibility + Outlet_Size, data = train, importance = TRUE,ntree = 800 )
+ # removed item type too
+pred_rf3 <- predict(rf_model3, test)
+
+solution3 <- data.frame(Item_Identifier= test$Item_Identifier,
+                        Outlet_Identifier= test$Outlet_Identifier, Item_Outlet_Sales = pred_rf3)
+
+write.csv(solution3, file = 'bigmart sales 3 ', row.names = F)
+  ##  rmse score  improved
+ ## removed item_weight
+ 
+ rf_model4 <- randomForest(Item_Outlet_Sales ~  Item_MRP + 
+ Outlet_Establishment_Year + Outlet_Location_Type + Outlet_Type +  
+ Item_Visibility + Outlet_Size, data = train, importance = TRUE,ntree = 800 ) 
+
+pred_rf4<- predict(rf_model4, test)
+solution4 <- data.frame(Item_Identifier= test$Item_Identifier,
+       Outlet_Identifier= test$Outlet_Identifier, Item_Outlet_Sales = pred_rf4)
+
+write.csv(solution4, file = 'bigmart sales 4', row.names = F)
+##  rmse score improved
+
+## further removing variables reduces increase rmse score so not appropiate 
+ 
+ 
