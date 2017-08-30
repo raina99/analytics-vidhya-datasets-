@@ -231,6 +231,6 @@ solution4 <- data.frame(Item_Identifier= test$Item_Identifier,
 write.csv(solution4, file = 'bigmart sales 4', row.names = F)
 ##  rmse score improved
 
-## further removing variables reduces increase rmse score so not appropiate 
+## further removing variables  increase rmse score so not appropiate. 
  
  
