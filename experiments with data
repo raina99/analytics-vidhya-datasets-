@@ -113,5 +113,4 @@ pred_train <- predict(fit,train,type = "class" )
 solution.frame <- data.frame(ID = test$ID, Income.Group = pred)
 
 write.csv(solution.frame,file = "final_solution.csv")
-mtcars[,] <- lapply(mtcars, function(x) type.convert(as.character(x), as.is = TRUE))
-e <- solution.frame
+
