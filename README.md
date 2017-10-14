@@ -11,12 +11,18 @@ Leaderboard link - https://datahack.analyticsvidhya.com/contest/practice-problem
 Problem statement - In this problem   different features relating to different customers are given and we 
 to predict whether customer is suitable enough to be considered for being provided loan
 
+
 Leaderboard link - https://datahack.analyticsvidhya.com/workshop/experiments-with-data-6/lb( Top 1 %)
 
 
  
+
 (3)  Bigmart sales -  It is an regression problem 
 
- Problem statement - The data scientists at BigMart have collected 2013 sales data for 1559 products across 10 stores in different cities. Also, certain attributes of each product and store have been defined. The aim is to build a predictive model and find out the sales of each product at a particular store.
+Problem statement - The data scientists at BigMart have collected 2013 sales data for 1559 products across 10 stores in different cities. Also, certain attributes of each product and store have been defined. The aim is to build a predictive model and find out the sales of each product at a particular store.
 Using this model, BigMart will try to understand the properties of products and stores which play a key role in increasing sales.
+
+
+
+Leaderboard link -https://datahack.analyticsvidhya.com/contest/practice-problem-big-mart-sales-iii/lb(Top 5%)
 
