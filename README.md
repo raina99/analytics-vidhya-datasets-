@@ -4,7 +4,7 @@ This repository contains solutions to different problems related to different da
 (1) Loan prediction problem - 
   Problem statement - Company wants to automate the loan eligibility process (real time) based on customer detail provided while filling online application form. These details are Gender, Marital Status, Education, Number of Dependents, Income, Loan Amount, Credit History and others. To automate this process, they have given a problem to identify the customers segments, those are eligible for loan amount so that they can specifically target these customers. Here they have provided a partial data set.
 
-Leaderboard link - https://datahack.analyticsvidhya.com/contest/practice-problem-loan-prediction-iii/lb
+Leaderboard link - https://datahack.analyticsvidhya.com/contest/practice-problem-loan-prediction-iii/lb ( Top 1%)
 
 
 (2) Experiment with data - Its an classification problem 
@@ -25,4 +25,15 @@ Using this model, BigMart will try to understand the properties of products and 
 
 
 Leaderboard link -https://datahack.analyticsvidhya.com/contest/practice-problem-big-mart-sales-iii/lb(Top 5%)
+
+
+
+(4)- Churn Prediction  hackathon
+
+Problem statement -Predicting customer churn (also known as Customer Attrition) represents an additional potential revenue source for any business. Customer churn impacts the cost to the business, for example, lost revenue and the marketing costs involved with replacing those customers with new ones. Reducing customer churn is a key goal for every business.
+
+Leaderboard link - https://datahack.analyticsvidhya.com/contest/data-science-hackathon-churn-prediction/lb ( Top 56 %)
+
+
+
 
