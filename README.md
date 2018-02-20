@@ -32,7 +32,7 @@ Leaderboard link -https://datahack.analyticsvidhya.com/contest/practice-problem-
 
 Problem statement -Predicting customer churn (also known as Customer Attrition) represents an additional potential revenue source for any business. Customer churn impacts the cost to the business, for example, lost revenue and the marketing costs involved with replacing those customers with new ones. Reducing customer churn is a key goal for every business.
 
-Leaderboard link - https://datahack.analyticsvidhya.com/contest/data-science-hackathon-churn-prediction/lb ( Top 56 %)
+Leaderboard link - https://datahack.analyticsvidhya.com/contest/data-science-hackathon-churn-prediction/lb ( Top 40 %)
 
 
 
